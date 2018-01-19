@@ -28,7 +28,7 @@ func (b *Bucket) Keys() []string {
 	return b.keys
 }
 
-func (b *Bucket) SetObject(key string, objCacher ObjectCacher) error {
+func (b *Bucket) Set(key string, objCacher ObjectCacher) error {
 	str, err := objCacher.Serialize()
 	if err != nil {
 		return err
@@ -43,7 +43,7 @@ func (b *Bucket) SetObject(key string, objCacher ObjectCacher) error {
 	return nil
 }
 
-func (b *Bucket) GetObject(key string, objCacher ObjectCacher) error {
+func (b *Bucket) Get(key string, objCacher ObjectCacher) error {
 	v, ok := b.data[key]
 	if !ok {
 		return errors.New("invalid object key")
@@ -55,7 +55,7 @@ func (b *Bucket) GetObject(key string, objCacher ObjectCacher) error {
 	return nil
 }
 
-func (b *Bucket) Set(key string, obj interface{}) error {
+func (b *Bucket) SetObject(key string, obj interface{}) error {
 	_, ok := b.data[key]
 	if !ok {
 		b.keys = append(b.keys, key)
@@ -70,7 +70,7 @@ func (b *Bucket) Set(key string, obj interface{}) error {
 	return nil
 }
 
-func (b *Bucket) Get(key string) (obj interface{}, err error) {
+func (b *Bucket) GetObject(key string) (obj interface{}, err error) {
 	v, ok := b.data[key]
 	if !ok {
 		return nil, errors.New("invalid object key")
