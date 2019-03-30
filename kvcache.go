@@ -1,4 +1,4 @@
-// kvcache.go
+// Package kvcache provide a atomic cache surport
 package kvcache
 
 import (
@@ -7,16 +7,19 @@ import (
 	"sync/atomic"
 )
 
+//ObjectCacher defined a interface to this cache engine
 type ObjectCacher interface {
 	Serialize() (obj string, err error)
 	Deserialize(obj string) (err error)
 }
 
+//Bucket defined a container to this cache engine
 type Bucket struct {
 	keys []string
 	data map[string]*atomic.Value
 }
 
+//NewBucket defined a function to create a new container of this cache engine
 func NewBucket() *Bucket {
 	return &Bucket{
 		keys: make([]string, 0),
@@ -24,10 +27,12 @@ func NewBucket() *Bucket {
 	}
 }
 
+//Keys return array of all keys in the Bucket
 func (b *Bucket) Keys() []string {
 	return b.keys
 }
 
+//Set storage a object to Bucket
 func (b *Bucket) Set(key string, objCacher ObjectCacher) error {
 	str, err := objCacher.Serialize()
 	if err != nil {
@@ -43,6 +48,7 @@ func (b *Bucket) Set(key string, objCacher ObjectCacher) error {
 	return nil
 }
 
+//Get use key to find object in Bucket
 func (b *Bucket) Get(key string, objCacher ObjectCacher) error {
 	v, ok := b.data[key]
 	if !ok {
@@ -55,6 +61,7 @@ func (b *Bucket) Get(key string, objCacher ObjectCacher) error {
 	return nil
 }
 
+//SetObject storage a object direct to Bucket
 func (b *Bucket) SetObject(key string, obj interface{}) error {
 	_, ok := b.data[key]
 	if !ok {
@@ -70,6 +77,7 @@ func (b *Bucket) SetObject(key string, obj interface{}) error {
 	return nil
 }
 
+//GetObject use key to find object in Bucket and return it without deserialize
 func (b *Bucket) GetObject(key string) (obj interface{}, err error) {
 	v, ok := b.data[key]
 	if !ok {
@@ -78,6 +86,7 @@ func (b *Bucket) GetObject(key string) (obj interface{}, err error) {
 	return v.Load(), nil
 }
 
+//Delete delete objects in array keys
 func (b *Bucket) Delete(keys ...string) int {
 	effect := 0
 	for _, v := range keys {
